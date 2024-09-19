@@ -1,5 +1,6 @@
 import pytest
 from channels.testing import WebsocketCommunicator
+from channels.layers import get_channel_layer
 
 from core.asgi import application
 
@@ -33,7 +34,14 @@ class TestWebSocket:
             'type': 'echo.message',
             'data': 'This is a test message.',
         }
-        await communicator.send_json_to(message)
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send('test', message=message)
         response = await communicator.receive_json_from()
         assert response == message
         await communicator.disconnect()
+
+    
+
+
+
+
