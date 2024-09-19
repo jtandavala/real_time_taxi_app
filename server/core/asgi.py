@@ -17,10 +17,13 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 
 from trips.consumers import TaxiConsumer
+from core.middleware import TokenAuthMiddlewareStack
 
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),
-    'websocket': URLRouter([
+    'websocket': TokenAuthMiddlewareStack(
+        URLRouter([
         path('taxi/', TaxiConsumer.as_asgi())
     ])
+    )
 })
