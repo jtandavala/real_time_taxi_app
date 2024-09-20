@@ -35,6 +35,13 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
     def _get_user_group(self, user):
         return user.groups.first().name
     
+    @database_sync_to_async
+    def _update_trip(self, data):
+        instance = Trip.objects.get(id=data.get('id'))
+        serializer = TripSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return serializer.update(instance, serializer.validated_data)
+    
 
     async def create_trip(self, message):
         data = message.get('data')
@@ -56,6 +63,32 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json({
             'type': 'echo.message',
             'data': trip_data,
+        })
+    
+    async def update_trip(self, message):
+        data = message.get('data')
+        trip = await self._update_trip(data)
+        trip_id = f'{trip.id}'
+        trip_data = await self._get_trip_data(trip)
+
+        
+        await self.channel_layer.group_send(
+            group=trip_id,
+            message={
+                'type': 'echo.message',
+                'data': trip_data,
+            }
+        )
+
+        
+        await self.channel_layer.group_add(
+            group=trip_id,
+            channel=self.channel_name
+        )
+
+        await self.send_json({
+            'type': 'echo.message',
+            'data': trip_data
         })
     
     async def connect(self):
@@ -108,5 +141,7 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
                 'type': message_type,
                 'data': content.get('data')
             })
+        elif message_type == 'update.trip': 
+            await self.update_trip(content)
 
     
