@@ -16,4 +16,10 @@ describe("Navigation", function () {
     cy.get("a").contains("Home").click();
     cy.hash().should("eq", "#/");
   });
+
+  it("Can navigate to log in from sign up", function () {
+    cy.visit("/#/sign-up");
+    cy.get("a").contains("Log in").click();
+    cy.hash().should("eq", "#/log-in");
+  });
 });
