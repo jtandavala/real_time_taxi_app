@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Login(props) {
+function LogIn(props) {
   return (
     <>
       <Link to="/">Home</Link>
@@ -13,4 +13,4 @@ function Login(props) {
   );
 }
 
-export default Login;
+export default LogIn;

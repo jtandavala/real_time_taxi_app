@@ -6,7 +6,7 @@ function Landing(props) {
     <div>
       <h1>Taxi</h1>
       <Link to="/sign-up">Sign up</Link>
-      <Link to="/log-in">Log-in</Link>
+      <Link to="/log-in">Log in</Link>
     </div>
   );
 }
